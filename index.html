@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f8ff; /* Light bluish background for the main content area */
+        }
+        .header, .footer {
+            background-color: #2c3e50; /* Dark blue/grey for header and footer */
+            color: #ecf0f1;
+        }
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Allows container to take up available space */
+            padding: 1rem; /* Add some padding */
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-300">
+    <!-- Header Section -->
+    <header class="header p-4 text-center shadow-md">
+        <h1 class="text-2xl font-semibold">TIMER</h1>
+    </header>
+
+    <!-- Main Timer Content -->
+    <main class="timer-container">
+        <!-- Timer Display -->
+        <div id="timerDisplay" class="text-7xl font-light tracking-wide text-gray-700 mb-8 sm:text-8xl md:text-9xl">
+            25 : 00
+        </div>
+
+        <!-- Buttons Container -->
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+            <!-- Start Button -->
+            <button id="startButton" class="px-8 py-4 bg-green-500 text-white font-medium rounded-xl shadow-lg hover:bg-green-600 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300 active:scale-95">
+                START
+            </button>
+            <!-- Stop Button -->
+            <button id="stopButton" class="px-8 py-4 bg-red-500 text-white font-medium rounded-xl shadow-lg hover:bg-red-600 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-red-300 active:scale-95">
+                STOP
+            </button>
+            <!-- Reset Button -->
+            <button id="resetButton" class="px-8 py-4 bg-lime-500 text-white font-medium rounded-xl shadow-lg hover:bg-lime-600 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-lime-300 active:scale-95">
+                RESET
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer p-3 text-center text-sm mt-auto">
+        &copy; 2025 Timer App. All rights reserved.
+    </footer>
+
+    <script>
+        // Get references to DOM elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resetButton = document.getElementById('resetButton');
+
+        // Initial timer values
+        let minutes = 25;
+        let seconds = 0;
+        let intervalId = null; // Stores the ID of the setInterval, used to clear it
+        let isRunning = false; // Flag to check if the timer is currently running
+
+        /**
+         * Updates the timer display in MM : SS format.
+         */
+        function updateDisplay() {
+            const displayMinutes = String(minutes).padStart(2, '0'); // Pad with leading zero if less than 10
+            const displaySeconds = String(seconds).padStart(2, '0'); // Pad with leading zero if less than 10
+            timerDisplay.textContent = `${displayMinutes} : ${displaySeconds}`;
+        }
+
+        /**
+         * Starts the timer countdown.
+         */
+        function startTimer() {
+            if (isRunning) {
+                // If timer is already running, do nothing to prevent multiple intervals
+                return;
+            }
+            isRunning = true; // Set running flag to true
+
+            // Set up an interval to update the timer every second
+            intervalId = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        // Timer has reached 00:00, stop the timer
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        isRunning = false;
+                        // Optionally, add an alert or visual indication that the timer is done
+                        console.log("Timer finished!");
+                        return;
+                    }
+                    // Decrement minutes and reset seconds to 59
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    // Decrement seconds
+                    seconds--;
+                }
+                updateDisplay(); // Update the display with new time
+            }, 1000); // Update every 1000 milliseconds (1 second)
+        }
+
+        /**
+         * Stops (pauses) the timer.
+         */
+        function stopTimer() {
+            if (intervalId) {
+                clearInterval(intervalId); // Clear the interval to stop the timer
+                intervalId = null; // Reset intervalId
+                isRunning = false; // Set running flag to false
+            }
+        }
+
+        /**
+         * Resets the timer to its initial state (25:00).
+         */
+        function resetTimer() {
+            stopTimer(); // First, stop the timer if it's running
+            minutes = 25; // Reset minutes
+            seconds = 0; // Reset seconds
+            updateDisplay(); // Update the display to show reset time
+        }
+
+        // Add event listeners to the buttons
+        startButton.addEventListener('click', startTimer);
+        stopButton.addEventListener('click', stopTimer);
+        resetButton.addEventListener('click', resetTimer);
+
+        // Initial display update when the page loads
+        document.addEventListener('DOMContentLoaded', updateDisplay);
+    </script>
+</body>
+</html>
